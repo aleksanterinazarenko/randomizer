@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <title>Multilingual Word Generator</title>
+    
+</head>
+<body>
+
+    <div class="container">
+        <h1>Random Word in 2 Languages</h1>
+
+        <div class="row">
+            <label for="language1">Choose Language 1:</label>
+            <select id="language1"></select>
+            <div class="word-display empty" id="word1">Word 1</div>
+        </div>
+        
+        <div class="row">
+            <label for="language2">Choose Language 2:</label>
+            <select id="language2"></select>
+            <div class="word-display empty" id="word2">Word 2</div>
+        </div>
+
+        <button onclick="drawWord()">Generate Random Word</button>
+    </div>
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+            margin-top: 0;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .row label {
+            flex: 1;
+            font-size: 16px;
+            color: #666;
+            text-align: left;
+            margin-right: 20px;
+        }
+
+        select {
+            flex: 1;
+            padding: 10px;
+            font-size: 17px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #f9fafb;
+            transition: all 0.3s;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .word-display {
+            flex: 3;
+            padding: 10px;
+            margin-left: 50px;
+            font-size: 17px;
+            color: #333;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .word-display.empty {
+            color: #aaa;
+            font-style: italic;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            font-size: 17px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 20px;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .row label {
+                flex: 1;
+                font-size: 0.9rem;
+            }
+
+            .row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+
+<script>
+    let words = [];
+    let languages = [];
+    let usedWords = new Set();
+
+    async function loadData() {
+        const response = await fetch('words.json'); 
+        words = await response.json();
+
+        languages = Object.keys(words[0]).filter(key => key !== "No.");
+
+        const language1Select = document.getElementById('language1');
+        const language2Select = document.getElementById('language2');
+
+        languages.forEach(lang => {
+            const option1 = document.createElement('option');
+            const option2 = document.createElement('option');
+            option1.value = lang;
+            option2.value = lang;
+            option1.textContent = lang;
+            option2.textContent = lang;
+            language1Select.appendChild(option1);
+            language2Select.appendChild(option2);
+        });
+    }
+
+    // Function to draw a random word
+    function drawWord() {
+        const lang1 = document.getElementById('language1').value;
+        const lang2 = document.getElementById('language2').value;
+
+        let selectedWord;
+        let randomIndex;
+
+        do {
+            randomIndex = Math.floor(Math.random() * words.length);
+            selectedWord = words[randomIndex];
+        } while (usedWords.has(selectedWord[lang1]) || usedWords.has(selectedWord[lang2]));
+
+        usedWords.add(selectedWord[lang1]);
+        usedWords.add(selectedWord[lang2]);
+
+        const word1Element = document.getElementById('word1');
+        const word2Element = document.getElementById('word2');
+
+        word1Element.innerText = selectedWord[lang1];
+        word2Element.innerText = selectedWord[lang2];
+
+        word1Element.classList.remove('empty');
+        word2Element.classList.remove('empty');
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
